@@ -47,6 +47,7 @@ bgm.loop = true;
 let fall = new Audio("./audio/sfx_die.wav");
 let point = new Audio("./audio/sfx_point.wav");
 let swooshing = new Audio("audio/sfx_swooshing.wav");
+let bestScore = localStorage.getItem("bestScore") || 0;
 
 window.onload = function () {
   board = document.getElementById("board");
@@ -144,10 +145,19 @@ function update() {
   }
   context.fillStyle = "white";
   context.font = "45px sans-serif";
-  context.fillText(score, 5, 45);
+  if (!gameOver) {
+    context.fillText(score, 5, 45);
+  }
 
   if (gameOver) {
     context.fillText("GAME OVER", 45, 300);
+    context.fillText(`Your score: ${score} `, 50, 350);
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem("bestScore", bestScore);
+    }
+    context.fillText(`Best score: ${bestScore} `, 5, 45);
+
     bgm.pause();
     bgm.currentTime = 0;
   }
