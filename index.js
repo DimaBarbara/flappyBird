@@ -53,6 +53,7 @@ let bgm = new Audio("./audio/bgm_mario.mp3");
 bgm.loop = true;
 let fall = new Audio("./audio/sfx_die.wav");
 let point = new Audio("./audio/sfx_point.wav");
+let gameOverMP = new Audio("./audio/game-over.mp3");
 let swooshing = new Audio("audio/sfx_swooshing.wav");
 let bestScore = localStorage.getItem("bestScore") || 0;
 
@@ -88,11 +89,15 @@ function startGame(e) {
     requestAnimationFrame(update);
     setInterval(placePipes, 1500);
   }
-  if (e.code == "Space" || e.code == "ArrowUp" || e.type == "click") {
+  if (
+    !gameOver &&
+    (e.code == "Space" || e.code == "ArrowUp" || e.type == "click")
+  ) {
     velocityY = -6;
     if (bgm.paused) {
       bgm.play();
     }
+    wingSound.currentTime = 0;
     wingSound.play();
   }
 }
@@ -117,6 +122,7 @@ function update() {
   birdImgsIndex++;
   birdImgsIndex %= birdImgs.length;
   if (bird.y === 0) {
+    swooshing.currentTime = 0;
     swooshing.play();
   }
   if (bird.y > board.height) {
@@ -163,6 +169,12 @@ function update() {
     context.fillText("Restart", buttonX + 15, buttonY + 33);
     board.addEventListener("click", restartGame);
     bgm.pause();
+    hitSound.pause();
+    if (!(bird.y > board.height)) {
+      gameOverMP.currentTime = 0;
+      gameOverMP.play();
+    }
+
     bgm.currentTime = 0;
   }
 }
@@ -183,6 +195,9 @@ function restartGame(e) {
     score = 0;
     gameOver = false;
     board.removeEventListener("click", restartGame);
+    document.addEventListener("keydown", startGame);
+    document.addEventListener("click", startGame);
+    gameOverMP.pause();
   }
 }
 
