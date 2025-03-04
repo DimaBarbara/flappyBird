@@ -39,6 +39,7 @@ let velocityY = 0;
 let gravity = 0.4;
 let gameOver = false;
 let score = 0;
+gameStarted = false;
 
 window.onload = function () {
   board = document.getElementById("board");
@@ -46,15 +47,9 @@ window.onload = function () {
   board.width = boardWidth;
   context = board.getContext("2d");
 
-  //   birdImg = new Image();
-  //   birdImg.src = "images/flappybird.png";
-  //   birdImg.onload = function () {
-  //     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
-  //   };
   for (let i = 1; i < 7; i++) {
     let birdImg = new Image();
     birdImg.src = `/images/Egor-${i}.png`;
-    setInterval(birdImgs.push(birdImg), 1500);
     birdImgs.push(birdImg);
   }
 
@@ -63,15 +58,37 @@ window.onload = function () {
 
   bottomPipeImg = new Image();
   bottomPipeImg.src = "/images/bottompipe.png";
-
-  requestAnimationFrame(update);
-  setInterval(placePipes, 1500);
-  document.addEventListener("keydown", moveBird);
+  document.addEventListener("keydown", startGame);
+  document.addEventListener("click", startGame);
+  context.fillStyle = "white";
+  context.font = "45px sans-serif";
+  context.fillText("Click to start", 45, 300);
 };
+function startGame(e) {
+  if (!gameStarted) {
+    gameStarted = true;
+    gameOver = false;
+    score = 0;
+    pipeArray = [];
+
+    requestAnimationFrame(update);
+    setInterval(placePipes, 1500);
+  }
+  if (e.code == "Space" || e.code == "ArrowUp" || e.type == "click") {
+    velocityY = -6;
+    if (gameOver) {
+      bird.y = birdY;
+      pipeArray = [];
+      score = 0;
+      gameOver = false;
+    }
+  }
+}
 
 function update() {
   requestAnimationFrame(update);
-  if (gameOver) {
+
+  if (!gameStarted || gameOver) {
     return;
   }
   context.clearRect(0, 0, board.width, board.height);
@@ -118,7 +135,7 @@ function update() {
 }
 
 function placePipes() {
-  if (gameOver) {
+  if (!gameStarted || gameOver) {
     return;
   }
 
@@ -145,17 +162,6 @@ function placePipes() {
     passed: false,
   };
   pipeArray.push(bottomPipe);
-}
-function moveBird(e) {
-  if (e.code == "Space" || e.code == "ArrowUp") {
-    velocityY = -6;
-    if (gameOver) {
-      bird.y = birdY;
-      pipeArray = [];
-      score = 0;
-      gameOver = false;
-    }
-  }
 }
 
 function deleteCollision(a, b) {
