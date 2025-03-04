@@ -32,6 +32,13 @@ let pipeY = 0;
 let topPipeImg;
 let bottomPipeImg;
 
+// button
+
+let buttonX = boardWidth / 2 - 60;
+let buttonY = boardHeight / 2 + 50;
+let buttonWidth = 120;
+let buttonHeight = 50;
+
 // physics
 
 let velocityX = -2;
@@ -78,7 +85,6 @@ function startGame(e) {
     gameOver = false;
     score = 0;
     pipeArray = [];
-
     requestAnimationFrame(update);
     setInterval(placePipes, 1500);
   }
@@ -88,13 +94,6 @@ function startGame(e) {
       bgm.play();
     }
     wingSound.play();
-
-    if (gameOver) {
-      bird.y = birdY;
-      pipeArray = [];
-      score = 0;
-      gameOver = false;
-    }
   }
 }
 
@@ -157,9 +156,33 @@ function update() {
       localStorage.setItem("bestScore", bestScore);
     }
     context.fillText(`Best score: ${bestScore} `, 5, 45);
-
+    context.fillStyle = "red";
+    context.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+    context.fillStyle = "white";
+    context.font = "25px sans-serif";
+    context.fillText("Restart", buttonX + 15, buttonY + 33);
+    board.addEventListener("click", restartGame);
     bgm.pause();
     bgm.currentTime = 0;
+  }
+}
+function restartGame(e) {
+  let rect = board.getBoundingClientRect();
+  let clickX = e.clientX - rect.left;
+  let clickY = e.clientY - rect.top;
+
+  if (
+    clickX >= buttonX &&
+    clickX <= buttonX + buttonWidth &&
+    clickY >= buttonY &&
+    clickY <= buttonY + buttonHeight
+  ) {
+    bird.y = birdY;
+    velocityY = 0;
+    pipeArray = [];
+    score = 0;
+    gameOver = false;
+    board.removeEventListener("click", restartGame);
   }
 }
 
