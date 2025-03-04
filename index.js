@@ -39,7 +39,14 @@ let velocityY = 0;
 let gravity = 0.4;
 let gameOver = false;
 let score = 0;
-gameStarted = false;
+let gameStarted = false;
+let wingSound = new Audio("./audio/sfx_wing.wav");
+let hitSound = new Audio("./audio/sfx_hit.wav");
+let bgm = new Audio("./audio/bgm_mario.mp3");
+bgm.loop = true;
+let fall = new Audio("./audio/sfx_die.wav");
+let point = new Audio("./audio/sfx_point.wav");
+let swooshing = new Audio("audio/sfx_swooshing.wav");
 
 window.onload = function () {
   board = document.getElementById("board");
@@ -47,9 +54,9 @@ window.onload = function () {
   board.width = boardWidth;
   context = board.getContext("2d");
 
-  for (let i = 1; i < 7; i++) {
+  for (let i = 0; i < 4; i++) {
     let birdImg = new Image();
-    birdImg.src = `/images/Egor-${i}.png`;
+    birdImg.src = `/images/flappybird${i}.png`;
     birdImgs.push(birdImg);
   }
 
@@ -62,7 +69,7 @@ window.onload = function () {
   document.addEventListener("click", startGame);
   context.fillStyle = "white";
   context.font = "45px sans-serif";
-  context.fillText("Click to start", 45, 300);
+  context.fillText("Click to start", 50, 300);
 };
 function startGame(e) {
   if (!gameStarted) {
@@ -76,6 +83,11 @@ function startGame(e) {
   }
   if (e.code == "Space" || e.code == "ArrowUp" || e.type == "click") {
     velocityY = -6;
+    if (bgm.paused) {
+      bgm.play();
+    }
+    wingSound.play();
+
     if (gameOver) {
       bird.y = birdY;
       pipeArray = [];
@@ -104,9 +116,12 @@ function update() {
   );
   birdImgsIndex++;
   birdImgsIndex %= birdImgs.length;
-
+  if (bird.y === 0) {
+    swooshing.play();
+  }
   if (bird.y > board.height) {
     gameOver = true;
+    fall.play();
   }
   for (let i = 0; i < pipeArray.length; i++) {
     let pipe = pipeArray[i];
@@ -116,9 +131,11 @@ function update() {
     if (!pipe.passed && bird.x > pipe.x + pipe.width) {
       score += 0.5;
       pipe.passed = true;
+      point.play();
     }
 
     if (deleteCollision(bird, pipe)) {
+      hitSound.play();
       gameOver = true;
     }
   }
@@ -131,6 +148,8 @@ function update() {
 
   if (gameOver) {
     context.fillText("GAME OVER", 45, 300);
+    bgm.pause();
+    bgm.currentTime = 0;
   }
 }
 
