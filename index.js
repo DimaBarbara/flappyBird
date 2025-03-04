@@ -11,6 +11,8 @@ let birdWidth = 34;
 let birdHeight = 24;
 let birdX = boardWidth / 8;
 let birdY = boardHeight / 2;
+let birdImgs = [];
+let birdImgsIndex = 0;
 
 let bird = {
   x: birdX,
@@ -44,11 +46,17 @@ window.onload = function () {
   board.width = boardWidth;
   context = board.getContext("2d");
 
-  birdImg = new Image();
-  birdImg.src = "images/flappybird.png";
-  birdImg.onload = function () {
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
-  };
+  //   birdImg = new Image();
+  //   birdImg.src = "images/flappybird.png";
+  //   birdImg.onload = function () {
+  //     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+  //   };
+  for (let i = 1; i < 7; i++) {
+    let birdImg = new Image();
+    birdImg.src = `/images/Egor-${i}.png`;
+    setInterval(birdImgs.push(birdImg), 1500);
+    birdImgs.push(birdImg);
+  }
 
   topPipeImg = new Image();
   topPipeImg.src = "./images/toppipe.png";
@@ -70,7 +78,15 @@ function update() {
 
   velocityY += gravity;
   bird.y = Math.max(bird.y + velocityY, 0);
-  context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+  context.drawImage(
+    birdImgs[birdImgsIndex],
+    bird.x,
+    bird.y,
+    bird.width,
+    bird.height
+  );
+  birdImgsIndex++;
+  birdImgsIndex %= birdImgs.length;
 
   if (bird.y > board.height) {
     gameOver = true;
